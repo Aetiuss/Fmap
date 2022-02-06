@@ -13,4 +13,6 @@ tr '\n' , <pt_tmp > pt
 
 rm pt_recon 
 
-cat pt
+nmap -A -T4 -p $(cat pt) $host | tee tcp-scan
+
+rm pt
