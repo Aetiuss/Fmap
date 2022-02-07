@@ -1,18 +1,48 @@
 #!/bin/sh
 
+#Read the command flags
 while getopts h: flag
 do 
 	case "${flag}" in 
 		h) host=${OPTARG};; 
 	esac done
 
+
+echo "#Smap needs to be run with sudo because of UDP scan#"
+
+#TCP Part
+##Global TCP portscan
 nmap -sT -p- -T4 -Pn $host | tee pt_recon
 
+##Formatting results to port numbers: #,#,
 grep -oP "[0-9]+?(?=\/)" pt_recon > pt_tmp
 tr '\n' , <pt_tmp > pt
 
-rm pt_recon 
-
+##Precision all-inclusive scan on detected open ports
 nmap -A -T4 -p $(cat pt) $host | tee tcp-scan
 
-rm pt
+
+echo "\n-------------------------------------------"
+echo "\nTCP scan finished, now starting UDP scan...\n"
+echo "-------------------------------------------\n"
+
+#UDP Part
+##Global UDP portscan
+nmap -sU -p- --defeat-icmp-ratelimit -Pn $host | tee pt_recon
+
+##Formatting results to port numbers: #,#,
+grep -oP "[0-9]+?(?=\/)" pt_recon > pt_tmp
+tr '\n' , <pt_tmp > pt
+
+##Precision all-inclusive scan on detected open ports
+sudo nmap -sUCV -T4 -p $(cat pt) $host | tee udp-scan
+
+##Cleaning
+rm pt pt_recon pt_tmp
+
+echo "\n-------------------------------------------"
+echo "\nUDP scan finished, end of script."
+echo "Full scan results have been outputed to ./tcp-scan & ./udp-scan\n"
+echo "-------------------------------------------\n\n"
+echo "/!\\ UDP ports open|filtered were potentially ignored for faster results /!\\"
+echo "(if you want a normal but slower UDP scan, run: sudo nmap -sU -p- -Pn <host-ip>)"
