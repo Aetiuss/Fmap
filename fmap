@@ -28,14 +28,14 @@ echo "-------------------------------------------\n"
 
 #UDP Part
 ##Global UDP portscan
-nmap -sU -p- --defeat-icmp-ratelimit -Pn $host | tee pt_recon
+nmap -sU -p- -T4 --defeat-icmp-ratelimit -Pn $host | tee pt_recon
 
 ##Formatting results to port numbers: #,#,
 grep -oP "[0-9]+?(?=\/)" pt_recon > pt_tmp
 tr '\n' , <pt_tmp > pt
 
 ##Precision all-inclusive scan on detected open ports
-sudo nmap -sUCV -T4 -p $(cat pt) $host | tee udp-scan
+sudo nmap -sUCVA -T4 -p $(cat pt) $host | tee udp-scan
 
 ##Cleaning
 rm pt pt_recon pt_tmp
