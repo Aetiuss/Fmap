@@ -19,7 +19,7 @@ grep -oP "[0-9]+?(?=\/)" pt_recon > pt_tmp
 tr '\n' , <pt_tmp > pt
 
 ##Precision all-inclusive scan on detected open ports
-nmap -A -T4 -p $(cat pt) $host | tee tcp-scan
+nmap -A -T4 -p $(cat pt) $host | tee "$host-tcp"
 
 
 echo "\n-------------------------------------------"
@@ -35,7 +35,7 @@ grep -oP "[0-9]+?(?=\/)" pt_recon > pt_tmp
 tr '\n' , <pt_tmp > pt
 
 ##Precision all-inclusive scan on detected open ports
-sudo nmap -sUCVA -T4 -p $(cat pt) $host | tee udp-scan
+sudo nmap -sUCVA -T4 -p $(cat pt) $host | tee "$host-udp"
 
 ##Cleaning
 rm pt pt_recon pt_tmp
